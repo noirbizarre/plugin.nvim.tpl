@@ -1,0 +1,7 @@
+.lux/
+.mise/
+doc/tags
+.mise.local.toml
+mise.local.toml
+.DS_Store
+ship.release.json

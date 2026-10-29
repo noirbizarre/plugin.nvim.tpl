@@ -1,0 +1,28 @@
+local M = {}
+local version_ge = vim.version.ge
+
+---@param version vim.Version
+---@return boolean
+function M.supported(version)
+{% if nightly_only %}    return version.prerelease ~= nil and version_ge(version, "{{ selected_versions[0].runtime_min }}")
+{% else %}    return version_ge(version, "{{ selected_versions[0].runtime_min }}")
+{% endif %}end
+
+function M.check()
+    vim.health.start("{{ plugin_name }}")
+    local current_version = vim.version --[[@as fun(): vim.Version]]
+    if M.supported(current_version()) then
+        vim.health.ok("{{ requirement }}")
+    else
+        vim.health.error("Requires {{ requirement }}")
+    end
+    local ok, config = pcall(require, "{{ module_name }}.config")
+    if ok then
+        vim.health.ok("Configuration loaded (setup is optional)")
+        vim.health.info(vim.inspect(config.get()))
+    else
+        vim.health.error("Unable to load configuration: " .. tostring(config))
+    end
+end
+
+return M

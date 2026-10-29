@@ -1,0 +1,13 @@
+---@meta
+-- The small assertion surface used by this scaffold. Extend it as specs grow.
+---@class PluginTestAssert
+---@field same fun(expected: any, actual: any)
+---@field equal fun(expected: any, actual: any)
+---@field has_error fun(callback: fun())
+---@field is_true fun(value: any, message?: string)
+---@field is_false fun(value: any)
+---@field is_nil fun(value: any)
+---@field stub fun(value: any): PluginTestStubAssert
+
+---@class PluginTestStubAssert
+---@field was_called_with fun(...: any)

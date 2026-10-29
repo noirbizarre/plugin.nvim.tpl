@@ -1,0 +1,14 @@
+# $schema: https://noirbizarre.github.io/gh-ship/schema/config/v1.json
+version: 1
+release_branch: release/next
+workflows:
+  prepare: prepare-release
+  publish: publish-release
+pull_request:
+  title: {% raw %}"chore(release): {{ version }}"{% endraw %}
+  header: "Prepare the next release of {{ plugin_name }}. Review the changelog and merge after CI passes."
+  labels: [release]
+  reuse: true
+release:
+  draft: true
+  publish_input: ref

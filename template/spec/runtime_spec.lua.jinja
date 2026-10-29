@@ -1,0 +1,35 @@
+local assert = assert --[[@as PluginTestAssert]]
+
+describe("runtime entrypoint", function()
+    local saved = {}
+    local notify
+
+    before_each(function()
+        for _, name in ipairs({ "{{ module_name }}", "{{ module_name }}.config" }) do
+            saved[name] = package.loaded[name]
+            package.loaded[name] = nil
+        end
+        vim.g.loaded_{{ module_name }} = nil
+        pcall(vim.api.nvim_del_user_command, "{{ command_name }}")
+        notify = stub(vim, "notify")
+    end)
+
+    after_each(function()
+        notify:revert()
+        for _, name in ipairs({ "{{ module_name }}", "{{ module_name }}.config" }) do
+            package.loaded[name] = saved[name]
+        end
+    end)
+
+    it("loads lazily, works without setup, and can be sourced twice", function()
+        vim.cmd("runtime plugin/{{ module_name }}.lua")
+        vim.cmd("runtime plugin/{{ module_name }}.lua")
+        assert.is_nil(package.loaded["{{ module_name }}"])
+        assert.is_nil(package.loaded["{{ module_name }}.config"])
+        vim.cmd("{{ command_name }}")
+        assert.stub(notify).was_called_with("Hello, Neovim!", vim.log.levels.INFO, { title = "{{ plugin_name }}" })
+        require("{{ module_name }}").setup({ greeting = "Hi" })
+        vim.cmd("{{ command_name }} Lua")
+        assert.stub(notify).was_called_with("Hi, Lua!", vim.log.levels.INFO, { title = "{{ plugin_name }}" })
+    end)
+end)

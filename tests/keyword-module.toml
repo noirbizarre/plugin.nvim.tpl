@@ -1,0 +1,8 @@
+[answers]
+plugin_name = "keyword.nvim"
+module_name = "end"
+command_name = "Keyword"
+
+[expect]
+files = ["lua/end/init.lua", "plugin/end.lua"]
+absent = ["doc/end.txt"]

@@ -1,0 +1,18 @@
+local M = {}
+
+---@param opts? {{ module_name }}.SetupOpts
+function M.setup(opts)
+    require("{{ module_name }}.config").setup(opts)
+end
+
+---An example action. Replace this with your plugin's public API.
+---@param name? string
+---@return string
+function M.greet(name)
+    local config = require("{{ module_name }}.config").get()
+    local message = ("%s, %s!"):format(config.greeting, name or "Neovim")
+    vim.notify(message, vim.log.levels.INFO, { title = "{{ plugin_name }}" })
+    return message
+end
+
+return M

@@ -1,0 +1,7 @@
+[answers]
+neovim_versions = ["nightly"]
+
+[expect.contains]
+".github/workflows/ci.yaml" = ['neovim: ["nightly"]']
+"README.md" = ["Neovim nightly"]
+"lua/example/health.lua" = ["prerelease ~= nil"]

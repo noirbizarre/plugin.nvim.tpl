@@ -1,0 +1,21 @@
+# Catalogue order controls the minimum requirement and CI matrix order.
+choices = [
+  { value = "0.12", label = "Neovim 0.12", help = "Stable 0.12 series" },
+  { value = "nightly", label = "Neovim nightly", help = "Development builds; required CI when selected" },
+]
+
+[[versions]]
+id = "0.12"
+tool = "neovim"
+ci = "v0.12.0"
+mise = "latest"
+requirement = "Neovim >= 0.12.0"
+runtime_min = "0.12.0"
+
+[[versions]]
+id = "nightly"
+tool = "github:neovim/neovim"
+ci = "nightly"
+mise = "nightly"
+requirement = "Neovim nightly (0.13.0-dev or newer development build)"
+runtime_min = "0.13.0-dev"

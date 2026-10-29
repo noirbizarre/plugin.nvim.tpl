@@ -1,0 +1,5 @@
+[answers]
+command_name = "lowercase"
+
+[expect]
+error = "tpl::eval::pattern_mismatch"

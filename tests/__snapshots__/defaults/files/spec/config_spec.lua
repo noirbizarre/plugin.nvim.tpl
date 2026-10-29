@@ -1,0 +1,36 @@
+local assert = assert --[[@as PluginTestAssert]]
+
+describe("configuration", function()
+    local config = require("example.config")
+
+    before_each(function()
+        config.setup()
+    end)
+
+    it("works without setup and resets to fresh defaults", function()
+        assert.same({ greeting = "Hello" }, config.get())
+        config.setup({ greeting = "Hi" })
+        config.setup()
+        assert.same({ greeting = "Hello" }, config.get())
+    end)
+
+    it("does not expose or retain caller-owned tables", function()
+        local opts = { greeting = "Hi" }
+        config.setup(opts)
+        opts.greeting = "Changed"
+        local snapshot = config.get()
+        snapshot.greeting = "Changed again"
+        assert.equal("Hi", config.get().greeting)
+    end)
+
+    it("rejects malformed and unknown options without changing valid configuration", function()
+        config.setup({ greeting = "Hi" })
+        assert.has_error(function()
+            config.setup({ greeting = 42 } --[[@as any]])
+        end)
+        assert.has_error(function()
+            config.setup({ typo = true } --[[@as any]])
+        end)
+        assert.equal("Hi", config.get().greeting)
+    end)
+end)

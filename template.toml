@@ -1,0 +1,76 @@
+name = "plugin.nvim"
+description = "A modern Lua Neovim plugin with tests, Vim help, and gh-ship releases"
+root = "template"
+strict = true
+note_file = "notes/next-steps.md.jinja"
+
+[data.neovim]
+source = "data/neovim.toml"
+
+[questions.plugin_name]
+type = "string"
+prompt = "Repository name"
+default = "example.nvim"
+default_from = "{{ remote.name | default(dir.name) }}"
+pattern = "^[a-z][a-z0-9_-]*(\\.nvim)?$"
+message = "Use lowercase letters, digits, underscores or hyphens, optionally followed by .nvim"
+
+[questions.description]
+type = "string"
+prompt = "One-line plugin description"
+default = "A delightful Neovim plugin"
+pattern = "^[^\\r\\n]+$"
+message = "Provide a nonempty, single-line description"
+
+[questions.owner]
+type = "string"
+prompt = "GitHub owner or organization"
+default = "your-name"
+default_from = "{{ remote.owner }}"
+pattern = "^[A-Za-z0-9][A-Za-z0-9-]*$"
+message = "Use a GitHub username or organization name"
+
+[questions.author]
+type = "string"
+prompt = "License author"
+default = "Plugin authors"
+default_from = "git:user.name"
+pattern = "^[^\\r\\n]+$"
+message = "Provide a nonempty, single-line author name"
+
+[questions.year]
+type = "integer"
+prompt = "Copyright year"
+default = 2026
+
+[questions.module_name]
+type = "string"
+prompt = "Lua module name"
+help = "A single lowercase namespace; Lua keywords are safe because require() takes a string"
+default = "{{ plugin_name | replace('.nvim', '') | replace('-', '_') }}"
+pattern = "^[a-z][a-z0-9_]{0,31}$"
+message = "Use 1–32 lowercase letters, digits or underscores, beginning with a letter"
+
+[questions.command_name]
+type = "string"
+prompt = "Example user command"
+default = "{{ module_name | replace('_', '') | capitalize }}"
+pattern = "^[A-Z][A-Za-z0-9]*$"
+message = "Use an Ex command name beginning with an uppercase letter"
+
+[questions.neovim_versions]
+type = "multi_choice"
+prompt = "Supported Neovim versions"
+choices_from = "data.neovim.choices"
+default = ["0.12", "nightly"]
+
+[computed]
+selected_versions = "{{ data.neovim.versions | selectattr('id', 'in', neovim_versions) | list }}"
+# Accessing the first entry rejects an empty selection before any files render.
+requirement = "{{ selected_versions[0].requirement }}"
+dev_version = "{{ selected_versions[0].mise }}"
+nightly_only = "{{ selected_versions[0].id == 'nightly' }}"
+repo_url = "https://github.com/{{ owner }}/{{ plugin_name }}"
+
+[remotes]
+origin = "git@github.com:{{ owner }}/{{ plugin_name }}.git"

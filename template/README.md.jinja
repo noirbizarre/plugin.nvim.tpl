@@ -1,0 +1,91 @@
+<!-- panvimdoc-ignore-start -->
+
+# {{ plugin_name }}
+
+{{ description }}
+
+[![CI]({{ repo_url }}/actions/workflows/ci.yaml/badge.svg)]({{ repo_url }}/actions/workflows/ci.yaml)
+
+<!-- panvimdoc-ignore-end -->
+
+## Requirements
+
+```text
+{{ requirement }}
+```
+
+No runtime dependencies. Selected nightly builds are required to pass CI.
+
+## Installation
+
+With Neovim's built-in package manager:
+
+```lua
+vim.pack.add({ "{{ repo_url }}" })
+```
+
+With lazy.nvim:
+
+```lua
+{ "{{ owner }}/{{ plugin_name }}", main = "{{ module_name }}", opts = {} }
+```
+
+Setup is optional. Commands load their implementation only when invoked.
+
+## Configuration
+
+The complete default configuration:
+
+```lua
+require("{{ module_name }}").setup({
+    greeting = "Hello",
+})
+```
+
+Setup replaces the configuration with fresh defaults plus your options. Unknown
+options and invalid types are rejected without changing the current configuration.
+
+## Usage
+
+Try the example command, optionally providing a name:
+
+```vim
+:{{ command_name }}
+:{{ command_name }} Lua
+```
+
+The same action is available from Lua. It shows a notification and returns its text:
+
+```lua
+local message = require("{{ module_name }}").greet("Lua")
+```
+
+Assign your own mappings if desired; the plugin does not create default mappings.
+
+## Troubleshooting
+
+```vim
+:checkhealth {{ module_name }}
+:help {{ module_name }}.txt
+```
+
+Reproduce problems with a clean configuration from the plugin repository root:
+
+```sh
+nvim --clean -u scripts/minimal_init.lua
+```
+
+## Development
+
+See CONTRIBUTING.md for tooling, tests, documentation generation, and releases.
+README.md is the source for the committed Vim help. After editing it, run:
+
+```sh
+mise run docs
+mise run test
+mise run lint
+```
+
+## License
+
+MIT. See LICENSE.

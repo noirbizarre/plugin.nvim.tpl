@@ -1,0 +1,2 @@
+[files]
+extend-exclude = ["template/", "tests/__snapshots__/", "mise.lock", ".opencode/"]

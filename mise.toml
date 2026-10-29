@@ -1,0 +1,48 @@
+[settings]
+lockfile = true
+lockfile_platforms = ["linux-x64", "linux-arm64"]
+
+[tools]
+neovim = "latest"
+prek = "latest"
+actionlint = "latest"
+"aqua:koalaman/shellcheck" = "latest"
+"github:lumen-oss/lux" = { version = "latest", matching = "lx-" }
+node = "latest"
+"npm:markdownlint-cli2" = "latest"
+typos = "latest"
+"github:noirbizarre/git-tpl" = "latest"
+
+[tasks.default]
+depends = ["lint", "test"]
+
+[tasks.lint]
+depends = ["lint:template", "lint:actions", "lint:markdown", "spell"]
+
+[tasks."lint:template"]
+run = "git tpl lint . --dirty -D warnings"
+
+[tasks."lint:actions"]
+run = "actionlint"
+
+[tasks."lint:markdown"]
+run = "markdownlint-cli2 README.md"
+
+[tasks.spell]
+run = "typos"
+
+[tasks.test]
+run = "git tpl test"
+
+[tasks."test:write"]
+run = "git tpl test --write"
+
+[tasks.render]
+usage = 'arg "<case>" default="defaults"'
+run = """
+#!/usr/bin/env bash
+set -euo pipefail
+case="${usage_case:-defaults}"
+out="${OUT:-$(mktemp -d)}"
+git tpl render . --dirty --output "$out" --force --defaults --strict-answers --answers-from "tests/$case.toml"
+"""

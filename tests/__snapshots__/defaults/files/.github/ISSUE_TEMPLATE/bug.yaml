@@ -1,0 +1,17 @@
+name: Bug report
+description: Report a reproducible problem
+body:
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions and health check
+      description: Include nvim --version, the plugin commit, and the plugin's checkhealth output.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include a minimal configuration, steps, expected behavior, and actual behavior.
+    validations:
+      required: true

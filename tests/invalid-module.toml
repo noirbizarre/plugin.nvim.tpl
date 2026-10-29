@@ -1,0 +1,5 @@
+[answers]
+module_name = "../escape"
+
+[expect]
+error = "tpl::eval::pattern_mismatch"

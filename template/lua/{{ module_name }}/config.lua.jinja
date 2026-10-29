@@ -1,0 +1,30 @@
+---@class {{ module_name }}.Config
+---@field greeting string Greeting used by the example action
+
+---@class (partial) {{ module_name }}.SetupOpts: {{ module_name }}.Config
+
+local M = {}
+
+---@type {{ module_name }}.Config
+local defaults = { greeting = "Hello" }
+local config = vim.deepcopy(defaults)
+
+---@param opts? {{ module_name }}.SetupOpts
+function M.setup(opts)
+    vim.validate("opts", opts, "table", true)
+    opts = opts or {}
+    for key in pairs(opts) do
+        if defaults[key] == nil then
+            error("{{ plugin_name }}: unknown option " .. tostring(key))
+        end
+    end
+    vim.validate("greeting", opts.greeting, "string", true)
+    config = vim.tbl_deep_extend("force", vim.deepcopy(defaults), vim.deepcopy(opts))
+end
+
+---@return {{ module_name }}.Config
+function M.get()
+    return vim.deepcopy(config)
+end
+
+return M

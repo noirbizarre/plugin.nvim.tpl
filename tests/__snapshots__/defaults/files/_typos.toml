@@ -1,0 +1,2 @@
+[files]
+extend-exclude = ["doc/", ".lux/", "lux.lock", "mise.lock"]

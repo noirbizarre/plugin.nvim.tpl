@@ -1,0 +1,36 @@
+name: Publish Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        type: string
+        required: true
+  workflow_call:
+    inputs:
+      ref:
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: release
+      url: ${{ github.server_url }}/${{ github.repository }}/releases
+    steps:
+      # A dispatch runs on the tag's immutable SHA; reusable callers supply an explicit ref.
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.sha || inputs.ref }}
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+      - run: mise run test
+      - run: mise run format
+      - run: 'mise run lint:lua ::: check ::: docs'
+      - run: git diff --exit-code -- lux.lock doc/ lua/ plugin/ scripts/ spec/
+      # No assets: GitHub provides source archives for the release tag.

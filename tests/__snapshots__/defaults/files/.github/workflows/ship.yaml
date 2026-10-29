@@ -1,0 +1,42 @@
+name: Ship
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+# Merging fires both events. Never cancel an active orchestration.
+concurrency:
+  group: ship
+  cancel-in-progress: false
+
+jobs:
+  ship:
+    if: >-
+      github.repository_owner == 'your-name'
+      && (github.event_name == 'push'
+          || (github.event.pull_request.merged
+              && github.event.pull_request.head.repo.full_name == github.repository))
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    environment:
+      name: release
+      deployment: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - run: gh extension install noirbizarre/gh-ship --pin 0.6.0
+        env:
+
+          GH_TOKEN: ${{ github.token }}
+      - run: gh ship run
+        env:
+          SHIP_APP_CLIENT_ID: ${{ vars.APP_CLIENT_ID }}
+          SHIP_APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+          SHIP_RUN_TIMEOUT: 7200

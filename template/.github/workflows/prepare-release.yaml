@@ -1,0 +1,117 @@
+name: Prepare Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        type: boolean
+        required: false
+        default: false
+  workflow_call:
+    inputs:
+      dry_run:
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: release
+      deployment: false
+    steps:
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3
+        id: app-token
+        with:
+          client-id: ${{ vars.APP_CLIENT_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+          token: ${{ steps.app-token.outputs.token }}
+      - uses: jdx/mise-action@v4
+      - run: gh extension install noirbizarre/gh-ship --pin 0.6.0
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+      - name: Compute the next version
+        id: version
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          last_tag="$(git describe --tags --abbrev=0 --match '[0-9]*.[0-9]*.[0-9]*' 2>/dev/null || true)"
+          next_tag="$(git cliff --bumped-version)"
+          {
+            echo "tag=$next_tag"
+            echo "version=$next_tag"
+          } >> "$GITHUB_OUTPUT"
+          if [ "$last_tag" = "$next_tag" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate the changelog
+        id: changelog
+        if: steps.version.outputs.changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          set -euo pipefail
+          git cliff --bump -o CHANGELOG.md
+          git cliff --unreleased --bump --strip all -o "$RUNNER_TEMP/ship-notes.md"
+          # The PR and GitHub Release already show the version in their title.
+          sed -i -e '0,/^## /{/^## /d}' -e '/./,$!d' "$RUNNER_TEMP/ship-notes.md"
+
+      - name: Commit and push
+        if: steps.version.outputs.changed == 'true' && !inputs.dry_run
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add CHANGELOG.md
+          git diff --cached --quiet || git commit -m "chore(release): $VERSION"
+          git push origin HEAD
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+      - name: Sign the release commit
+        if: steps.version.outputs.changed == 'true' && !inputs.dry_run
+        run: gh ship sign
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+      - name: Write the release artifact
+        id: artifact
+        env:
+          CHANGED: ${{ steps.version.outputs.changed }}
+          VERSION: ${{ steps.version.outputs.version }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if [ "$CHANGED" != true ]; then
+            jq -n '{schemaVersion: 1, changed: false}' > ship.release.json
+          else
+            jq -n \
+              --arg version "$VERSION" \
+              --arg tag "$TAG" \
+              --rawfile notes "$RUNNER_TEMP/ship-notes.md" \
+              '{
+                "$schema": "https://noirbizarre.github.io/gh-ship/schema/release/v1.json",
+                schemaVersion: 1,
+                changed: true,
+                version: $version,
+                tag: $tag,
+                release: { notes: $notes }
+              }' > ship.release.json
+          fi
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ship-release
+          path: ship.release.json
+          if-no-files-found: error

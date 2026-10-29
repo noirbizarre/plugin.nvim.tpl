@@ -1,0 +1,57 @@
+[settings]
+lockfile = true
+lockfile_platforms = ["linux-x64", "linux-arm64"]
+
+[tools]
+"neovim" = "latest"
+prek = "latest"
+actionlint = "latest"
+"aqua:koalaman/shellcheck" = "latest"
+git-cliff = "latest"
+pandoc = "latest"
+"github:lumen-oss/lux" = { version = "latest", matching = "lx-" }
+
+[tasks.test]
+description = "Run Busted inside isolated Neovim"
+run = "lx --no-luarc test"
+
+[tasks.lint]
+description = "Check Lua, workflows, types, documentation, and release configuration"
+depends = ["lint:lua", "lint:actions", "check", "docs", "ship:validate"]
+
+[tasks."lint:lua"]
+run = "lx --lua-version 5.1 lint"
+
+[tasks."lint:actions"]
+run = "actionlint"
+
+[tasks.check]
+description = "Type check with Lux using the selected Neovim's annotations"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+VIMRUNTIME="$(env -u VIM -u VIMRUNTIME "${NVIM_BIN:-nvim}" --clean --headless \
+  -c 'lua io.write(vim.env.VIMRUNTIME)' -c qa)"
+export VIMRUNTIME
+lx check --path lua --warnings-as-errors
+'''
+
+[tasks.format]
+# Lux formats the standard Lua source directories; include Neovim's runtime entrypoints too.
+run = ["lx fmt", "lx fmt --path plugin", "lx fmt --path scripts"]
+
+[tasks.docs]
+description = "Regenerate help (the hook exits 1 when it updates files; stage and rerun)"
+run = "prek run panvimdoc --files README.md"
+
+[tasks.changelog]
+run = "git cliff --unreleased"
+
+[tasks.release]
+description = "Preview the next version (gh-ship performs releases in CI)"
+run = "git cliff --bumped-version"
+
+[tasks."ship:validate"]
+run = "gh ship validate"
+
+# Add project-specific tools and tasks below this line.

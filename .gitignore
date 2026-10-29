@@ -1,0 +1,4 @@
+.mise/
+# mise files are globally ignored on some contributors' machines.
+!mise.toml
+!mise.lock

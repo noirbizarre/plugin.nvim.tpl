@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        neovim: ["0.12", "nightly"]
+        include:
+          - neovim: "0.12"
+            version: "v0.12.0"
+          - neovim: "nightly"
+            version: "nightly"
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+      - uses: rhysd/action-setup-vim@v1
+        id: neovim
+        with:
+          neovim: true
+
+          version: ${{ matrix.version }}
+      - uses: actions/cache@v5
+        with:
+          path: .lux
+          key: lux-${{ runner.os }}-${{ matrix.neovim }}-${{ hashFiles('lux.toml', 'lux.lock') }}
+      # nlua executes nvim from PATH; select the matrix executable explicitly.
+      - run: |
+          nvim_dir="$(dirname "$NVIM")"
+          export PATH="$nvim_dir:$PATH"
+          "$NVIM" --version
+          lx --no-luarc test
+          git diff --exit-code -- lux.lock
+        env:
+          NVIM: ${{ steps.neovim.outputs.executable }}
+      - run: mise run check
+        env:
+          NVIM_BIN: ${{ steps.neovim.outputs.executable }}
+
+
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+      - run: gh extension install noirbizarre/gh-ship --pin 0.6.0
+        env:
+
+          GH_TOKEN: ${{ github.token }}
+
+      - run: mise run format
+      - run: git diff --exit-code -- lua/ plugin/ scripts/ spec/
+      - run: mise run lint
+      - name: Show documentation repair instructions
+        if: failure()
+        run: |
+          git diff -- doc/
+          echo 'For stale help: run mise run docs, stage doc/, and rerun the hook before pushing.'
+      - run: prek run --all-files

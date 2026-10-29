@@ -1,0 +1,16 @@
+[answers]
+plugin_name = "a-long-plugin.nvim"
+module_name = "custom_namespace"
+command_name = "CustomGreet"
+owner = "test-org"
+author = 'A "quoted" author & friends'
+description = 'A "quoted" description with backslashes \ and Unicode: café'
+neovim_versions = ["nightly", "0.12"]
+
+[expect]
+files = ["lua/custom_namespace/init.lua", "plugin/custom_namespace.lua"]
+absent = ["lua/example/init.lua", "plugin/example.lua", "doc/custom_namespace.txt"]
+
+[expect.contains]
+".github/workflows/ci.yaml" = ['neovim: ["0.12", "nightly"]']
+"README.md" = ['A "quoted" description']

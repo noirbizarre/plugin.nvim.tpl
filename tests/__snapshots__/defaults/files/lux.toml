@@ -1,0 +1,18 @@
+package = "example.nvim"
+lua = "==5.1"
+
+[test_dependencies]
+busted = "==2.3.0"
+nlua = "==0.3.1"
+
+[test]
+type = "busted-nlua"
+flags = ["--verbose"]
+
+[build]
+type = "builtin"
+copy_directories = ["plugin", "doc"]
+
+[source]
+url = "https://github.com/your-name/example.nvim/archive/refs/tags/$(REF).zip"
+dev = "git+https://github.com/your-name/example.nvim.git"

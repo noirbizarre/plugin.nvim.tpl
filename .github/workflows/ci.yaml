@@ -1,0 +1,24 @@
+name: Template CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  template:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+      - run: gh extension install noirbizarre/gh-ship --pin 0.6.0
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - run: mise run lint
+      - run: mise run test
+      - run: prek run --all-files

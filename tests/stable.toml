@@ -1,0 +1,6 @@
+[answers]
+neovim_versions = ["0.12"]
+
+[expect.contains]
+".github/workflows/ci.yaml" = ['neovim: ["0.12"]']
+"README.md" = ["Neovim >= 0.12.0"]
