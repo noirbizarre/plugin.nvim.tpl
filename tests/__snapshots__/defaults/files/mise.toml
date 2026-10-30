@@ -16,8 +16,8 @@ description = "Run Busted inside isolated Neovim"
 run = "lx --no-luarc test"
 
 [tasks.lint]
-description = "Check Lua, workflows, types, documentation, and release configuration"
-depends = ["lint:lua", "lint:actions", "check", "docs", "ship:validate"]
+description = "Check Lua, workflows, types, and documentation"
+depends = ["lint:lua", "lint:actions", "check", "docs"]
 
 [tasks."lint:lua"]
 run = "lx --lua-version 5.1 lint"
@@ -50,8 +50,5 @@ run = "git cliff --unreleased"
 [tasks.release]
 description = "Preview the next version (gh-ship performs releases in CI)"
 run = "git cliff --bumped-version"
-
-[tasks."ship:validate"]
-run = "gh ship validate"
 
 # Add project-specific tools and tasks below this line.

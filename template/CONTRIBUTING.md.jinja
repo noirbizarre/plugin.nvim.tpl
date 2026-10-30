@@ -12,7 +12,6 @@ Neovim test backend on macOS and Windows.
 ```sh
 mise trust
 mise install
-gh extension install noirbizarre/gh-ship --pin 0.6.0
 mise exec -- prek install
 mise run test
 mise run lint
@@ -76,7 +75,7 @@ The workflow's default token only reads repository contents.
 Configure squash merge titles from the PR title and blank squash bodies:
 `squash_merge_commit_title: PR_TITLE`, `squash_merge_commit_message: BLANK`.
 Create a `release` issue label. Protect main with the normal CI checks.
-Validate changes to the release contract with `mise run ship:validate`.
+CI validates the release contract with `gh ship validate`; the extension is not needed for local development.
 
 ## Template updates
 

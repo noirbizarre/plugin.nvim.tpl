@@ -62,7 +62,6 @@ Lua module names are string namespaces: even Lua keywords work, without generati
 ```sh
 mise trust
 mise install
-gh extension install noirbizarre/gh-ship --pin 0.6.0
 mise run lint
 mise run test
 ```

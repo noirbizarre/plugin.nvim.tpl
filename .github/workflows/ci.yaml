@@ -18,9 +18,6 @@ jobs:
       - name: Install Lua build dependencies
         run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libreadline-dev
       - uses: jdx/mise-action@v4
-      - run: gh extension install noirbizarre/gh-ship --pin 0.6.0
-        env:
-          GH_TOKEN: ${{ github.token }}
       - run: mise run lint
       - run: mise run test
       - run: prek run --all-files
