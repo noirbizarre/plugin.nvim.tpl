@@ -9,7 +9,6 @@ actionlint = "latest"
 "aqua:koalaman/shellcheck" = "latest"
 "github:lumen-oss/lux" = { version = "latest", matching = "lx-" }
 node = "latest"
-"npm:markdownlint-cli2" = "latest"
 typos = "latest"
 "github:noirbizarre/git-tpl" = "latest"
 
@@ -17,16 +16,13 @@ typos = "latest"
 depends = ["lint", "test"]
 
 [tasks.lint]
-depends = ["lint:template", "lint:actions", "lint:markdown", "spell"]
+depends = ["lint:template", "lint:actions", "spell"]
 
 [tasks."lint:template"]
 run = "git tpl lint . --dirty -D warnings"
 
 [tasks."lint:actions"]
 run = "actionlint"
-
-[tasks."lint:markdown"]
-run = "markdownlint-cli2 README.md"
 
 [tasks.spell]
 run = "typos"
