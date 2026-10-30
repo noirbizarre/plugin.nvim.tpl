@@ -72,6 +72,7 @@ The default case also runs the generated plugin's Busted specs, Lux lint, and wo
 using git-tpl's built-in command checks.
 The default case records a complete snapshot; single-version, custom-name, and invalid-answer cases cover variations.
 First-time tests require network access, a C compiler, and make. Development tooling is validated on Linux.
+Lux's Lua source build also needs readline development headers (`libreadline-dev` on Debian/Ubuntu).
 Lux's Neovim test backend currently documents limitations on macOS and Windows.
 Tool declarations use `latest`; the committed `mise.lock` provides reproducibility for template development.
 Generated projects create their own `mise.lock` and `lux.lock` when installing tools and running tests.

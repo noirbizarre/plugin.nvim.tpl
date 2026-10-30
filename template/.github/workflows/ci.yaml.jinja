@@ -23,6 +23,8 @@ jobs:
 {% endfor %}
     steps:
       - uses: actions/checkout@v7
+      - name: Install Lua build dependencies
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libreadline-dev
       - uses: jdx/mise-action@v4
       - uses: rhysd/action-setup-vim@v1
         id: neovim
@@ -53,6 +55,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
+      - name: Install Lua build dependencies
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libreadline-dev
       - uses: jdx/mise-action@v4
       - run: gh extension install noirbizarre/gh-ship --pin 0.6.0
         env:

@@ -3,6 +3,7 @@
 ## Development environment
 
 Install [mise](https://mise.jdx.dev/), Git, a C compiler, and make.
+For Lux's Lua source build, install readline development headers (`libreadline-dev` on Debian/Ubuntu).
 [Lux](https://lux.lumen-labs.org/) manages Busted/nlua dependencies and runs tests inside a clean Neovim.
 The first run needs internet access. Lux's project dependencies and isolated test environment live in the ignored `.lux/`.
 The development/test toolchain is validated on Linux; Lux currently documents limitations for its
